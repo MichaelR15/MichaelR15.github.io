@@ -2,74 +2,25 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>In-App Nav Map</title>
+  <title>Test Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <style>
-    html, body, #map { height:100%; margin:0; }
-    .userDot { width:16px; height:16px; border-radius:50%; border:2px solid white; }
+    html, body, #map { height: 100%; margin: 0; padding: 0; }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script>
-    mapboxgl.accessToken = 'sk.eyJ1IjoicmF2ZW5nYW1pbmciLCJhIjoiY21lMjdnbnRtMG5oaTJqcXJvdzNvOXdjZSJ9.I4nvP92JycOHjtAuD8iCtQ';
+    mapboxgl.accessToken = 'sk.eyJ1IjoicmF2ZW5nYW1pbmciLCJhIjoiY21lMjdnbnRtMG5oaTJqcXJvdzNvOXdjZSJ9.I4nvP92JycOHjtAuD8iCtQ'; // Replace with your real token
 
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [0, 51.5], // lon, lat (London-ish)
+      center: [0, 51.5], // Longitude, Latitude
       zoom: 13
     });
-
-    // Route and user location layers
-    let routeSourceAdded = false;
-    let userMarker;
-
-    // Called from Thunkable to draw/replace a route (GeoJSON LineString)
-    window.setRoute = function(routeGeoJSONStr) {
-      const route = JSON.parse(routeGeoJSONStr);
-      if (!routeSourceAdded) {
-        map.on('load', () => {
-          map.addSource('route', { type: 'geojson', data: route });
-          map.addLayer({
-            id: 'route-line',
-            type: 'line',
-            source: 'route',
-            paint: { 'line-width': 6, 'line-color': '#0078ff' }
-          });
-          routeSourceAdded = true;
-          fitToRoute(route);
-        });
-      } else {
-        map.getSource('route').setData(route);
-        fitToRoute(route);
-      }
-    };
-
-    function fitToRoute(route) {
-      try {
-        const coords = route.geometry.coordinates;
-        const bounds = new mapboxgl.LngLatBounds(coords[0], coords[0]);
-        for (const c of coords) bounds.extend(c);
-        map.fitBounds(bounds, { padding: 60, duration: 700 });
-      } catch (e) {}
-    }
-
-    // Called from Thunkable to update user dot and keep camera on user
-    window.setUserPos = function(lat, lng, bearing) {
-      const el = document.createElement('div');
-      el.className = 'userDot';
-      el.style.background = '#2e7df6';
-      if (!userMarker) {
-        userMarker = new mapboxgl.Marker(el).setLngLat([lng, lat]).addTo(map);
-      } else {
-        userMarker.setLngLat([lng, lat]);
-      }
-      // Optional: follow the user with a gentle camera update
-      map.easeTo({ center: [lng, lat], bearing: bearing || map.getBearing(), duration: 500 });
-    };
   </script>
 </body>
 </html>
